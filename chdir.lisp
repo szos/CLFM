@@ -22,10 +22,9 @@ To relaunch CLFM please ensure it is in your $PATH")
 		       :title "CLFM Error"
 		       :name "CLFM Error"
 		       :documentation "CLFM Error"
-		       :text-style (make-text-style "ETBembo" "BoldLF" 18)
+                       :text-style (make-text-style "ETBembo" "BoldLF" 18)
 		       :exit-boxes '((t "OK")
-				     (:sudo "Relaunch with sudo")
-				     (:root "Relaunch as root")))
+				     (:sudo "Relaunch as root")))
 	((:sudo)
 	 (and (notify-user *application-frame*
 			   "WARNING: CLFM will now be running with root privilidges. 
@@ -33,7 +32,8 @@ This is not safe, and should be avoided.
 
 If you continue, type your password when presented with the blank window and use 
 M-RET (meta + return or Alt + return) to submit it"
-			   :exit-boxes '((t "CONTINUE") (nil "ABORT")))
+			   :exit-boxes '((t "CONTINUE") (nil "ABORT"))
+			   :text-style (make-text-style "ETBembo" "BoldLF" 18))
 	      (let (passwd
 		    (stream (frame-standard-input *application-frame*)))
 		(accepting-values (stream
@@ -48,11 +48,7 @@ M-RET (meta + return or Alt + return) to submit it"
 					     :stream stream
 					     :query-identifier 'password))))))
 		(uiop:launch-program
-		 (format nil "echo \"~a\" | sudo -S clfm" passwd))
-		;; (setf *passwd-test* passwd)
-		)))
-	((root)
-	 )))))
+		 (format nil "echo \"~a\" | sudo -S clfm" passwd)))))))))
 
 (define-clfm-command (com-chdir-~/ :name "Go Home") ()
   (com-change-directory "~/"))
