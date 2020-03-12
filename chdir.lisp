@@ -47,8 +47,10 @@ M-RET (meta + return or Alt + return) to submit it"
 					     :prompt "sudo password"
 					     :stream stream
 					     :query-identifier 'password))))))
-		;; (uiop:launch-program (format nil "echo ~a | sudo -S clfm" passwd))
-		(setf *passwd-test* passwd))))
+		(uiop:launch-program
+		 (format nil "echo \"~a\" | sudo -S clfm" passwd))
+		;; (setf *passwd-test* passwd)
+		)))
 	((root)
 	 )))))
 
