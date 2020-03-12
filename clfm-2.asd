@@ -23,4 +23,5 @@
 	       (:file "rename-file-directory")
 	       (:file "copy")
 	       (:file "delete-directory")
+	       (:file "mark-and-operate")
 	       (:file "commands")))

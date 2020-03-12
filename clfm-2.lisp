@@ -226,27 +226,34 @@
 						   :single-box t)
 		       (slim:row
 			 (with-etbembo (pane)
-			   (slim:cell
-			     (with-drawing-options (pane :ink +blue+)
-			       (format pane "Dir")))
-			   (slim:cell (format pane "~a" (file/directory-name
-							 (namestring path))))
-			   (slim:cell
-			     (format pane "~a"
-				     (cdr
-				      (assoc
-				       (format nil "~a"
-					       (and stat
-						    (osicat-posix:stat-uid stat)))
-				       *uid-username* :test #'string-equal))))
-			   (slim:cell
-			     (format pane "~a"
-				     (cdr
-				      (assoc
-				       (format nil "~a"
-					       (and stat
-						    (osicat-posix:stat-gid stat)))
-				       *gid-username* :test #'string-equal)))))
+			   (with-drawing-options
+			       (pane :ink (if (member (namestring path) *marks*
+						      :test #'string=)
+					      +orange+ +black+))
+			     (slim:cell
+			       (with-drawing-options
+				   (pane :ink (if (member (namestring path)
+							  *marks* :test #'string=)
+						  +orange+ +blue+))
+				 (format pane "Dir")))
+			     (slim:cell (format pane "~a" (file/directory-name
+							   (namestring path))))
+			     (slim:cell
+			       (format pane "~a"
+				       (cdr
+					(assoc
+					 (format nil "~a"
+						 (and stat
+						      (osicat-posix:stat-uid stat)))
+					 *uid-username* :test #'string-equal))))
+			     (slim:cell
+			       (format pane "~a"
+				       (cdr
+					(assoc
+					 (format nil "~a"
+						 (and stat
+						      (osicat-posix:stat-gid stat)))
+					 *gid-username* :test #'string-equal))))))
 			 (slim:cell
 			   (format pane "~a"
 				   (and stat (permissions-as-string path)))))))))
