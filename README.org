@@ -5,3 +5,6 @@
 
 ** Behaviore
    clicking on an item will either open it via =xdg-open=, or if its a directory it is entered. 
+
+* Quirks
+  - In order to leverage the feature of opening another pane as root, CLFM must be in the =$PATH=. 
