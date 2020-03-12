@@ -42,7 +42,7 @@ M-RET (meta + return or Alt + return) to submit it"
 		  (formatting-table (stream)
 		    (formatting-column (stream)
 		      (formatting-cell (stream)
-			(setf passwd (accept 'my-password
+			(setf passwd (accept 'password
 					     ;; 'string
 					     :prompt "sudo password"
 					     :stream stream
