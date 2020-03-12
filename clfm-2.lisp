@@ -130,7 +130,7 @@
   (:panes
    (info :application
 	 :display-function #'display-info
-	 :width 1080)
+	 :width 600)
    (current-directory :application
 		      :display-function #'display-current-directory)
    (interactor :interactor))
@@ -281,16 +281,7 @@
 				       (format nil "~a"
 					       (and stat
 						    (osicat-posix:stat-gid stat)))
-				       *gid-username* :test #'string-equal))))
-			   (slim:cell
-			     (slim:with-table (pane :equalize-column-widths t)
-			       (slim:row
-			     	 (loop for c across (permissions-as-string path)
-			     	       do (slim:cell
-			     		    (if (char= #\- c)
-			     			(format pane "-")
-			     			(format pane "~a" c))))))))
-			 ;; (slim:cell
-			 ;;   (format pane "~a"
-			 ;; 	   (and stat (permissions-as-string path))))
-			 ))))))))
+				       *gid-username* :test #'string-equal)))))
+			 (slim:cell
+			   (format pane "~a"
+			 	   (and stat (permissions-as-string path))))))))))))
