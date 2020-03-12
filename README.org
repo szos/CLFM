@@ -1,3 +1,7 @@
 #+TITLE: the Common Lisp File Manager
 
 * A File Manager Written in Common Lisp
+  This is a very regular file manager. It is mainly mouse driven, but the plan is to make it more keyboard oriented. 
+
+** Behaviore
+   clicking on an item will either open it via =xdg-open=, or if its a directory it is entered. 
