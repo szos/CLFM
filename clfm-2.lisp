@@ -131,11 +131,22 @@
    (info :application
 	 :display-function #'display-info
 	 :width 600)
+   (marks :application
+	  :display-function #'display-marks
+	  :width 600)
    (current-directory :application
 		      :display-function #'display-current-directory)
    (interactor :interactor))
   (:layouts
    (default
+    (vertically ()
+      (20 marks)
+      (20 info)
+      (horizontally ()
+	(:fill current-directory))
+      (make-pane 'clim-extensions:box-adjuster-gadget)
+      (100 interactor)))
+   (no-marks
     (vertically ()
       (20 info)
       (horizontally ()
@@ -182,6 +193,14 @@
       (format pane "Current Directory: "))
     (with-etbembo (pane :italic-bold)
       (looper (cl-ppcre:split "/" (namestring (uiop:getcwd)))))))
+
+(defun display-marks (frame pane)
+  (declare (ignore frame))
+  (with-end-of-line-action (pane :allow)
+    (with-etbembo (pane :bold)
+      (format pane "Current Marks: "))
+    (with-etbembo (pane :italic)
+      (format pane "~{~a~^  ~}" (or *marks* '(""))))))
 
 ;; 📁 is the folder uncode codepoint
 
@@ -302,7 +321,8 @@
 					(assoc
 					 (format nil "~a"
 						 (and stat
-						      (osicat-posix:stat-uid stat)))
+						      (osicat-posix:stat-uid
+						       stat)))
 					 *uid-username* :test #'string-equal))))
 			     (slim:cell
 			       (format pane "~a"
@@ -310,8 +330,10 @@
 					(assoc
 					 (format nil "~a"
 						 (and stat
-						      (osicat-posix:stat-gid stat)))
+						      (osicat-posix:stat-gid
+						       stat)))
 					 *gid-username* :test #'string-equal)))))
 			   (slim:cell
 			     (format pane "~a"
-				     (and stat (permissions-as-string path)))))))))))))
+				     (and stat
+					  (permissions-as-string path)))))))))))))
