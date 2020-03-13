@@ -150,6 +150,8 @@
 
 (defun app-main ()
   (initialize-fonts)
+  (handler-case (load "~/.clfm.d/init.lisp")
+    (t () ()))
   (run-frame-top-level (make-application-frame 'clfm)))
 
 (defun path> (one two)

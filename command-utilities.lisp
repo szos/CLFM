@@ -80,3 +80,7 @@ and cell. "
 (define-clfm-command (com-display-help-window) ()
   (let ((frame (make-application-frame 'clfm-help)))
     (run-frame-top-level frame)))
+
+(define-clfm-command (com-loadrc :name "Load Init File") ()
+  (handler-case (load "~/.clfm.d/init.lisp")
+    (t () ())))
