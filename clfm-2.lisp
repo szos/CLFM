@@ -25,15 +25,15 @@
 
 (defmacro with-etbembo ((stream &optional type (size 16)) &body body)
   `(with-text-style (,stream (make-text-style "ETBembo"
-					      ,(cond ((eq type :bold)
-						      "BoldLF")
-						     ((eq type :semi-bold)
-						      "SemiBoldOSF")
-						     ((eq type :italic)
-						      "DisplayItalic")
-						     ((eq type :italic-bold)
-						      "DisplayItalicBold")
-						     (t "RomanLF"))
+					      (cond ((eq ,type :bold)
+						     "BoldLF")
+						    ((eq ,type :semi-bold)
+						     "SemiBoldOSF")
+						    ((eq ,type :italic)
+						     "DisplayItalic")
+						    ((eq ,type :italic-bold)
+						     "DisplayItalicBold")
+						    (t "RomanLF"))
 					      ,size))
      ,@body))
 
@@ -221,20 +221,26 @@
 		do (let ((stat (handler-case (osicat-posix:stat path)
 				 (t () nil))))
 		     (with-output-as-presentation (pane
-						   path
+						   (namestring path)
 						   'chdir-presentation
 						   :single-box t)
 		       (slim:row
-			 (with-etbembo (pane)
-			   (with-drawing-options
-			       (pane :ink (if (member (namestring path) *marks*
-						      :test #'string=)
-					      +orange+ +black+))
+			 (with-drawing-options
+			     (pane :ink (if (member (namestring path) *marks*
+						    :test #'string=)
+					    +orange-red+ +black+))
+			   (with-text-style
+			       (pane (make-text-style
+				      "ETBembo" (if (member (namestring path)
+							    *marks*
+							    :test #'string=)
+						    "DisplayItalicBold" "RomanLF")
+				      16))
 			     (slim:cell
 			       (with-drawing-options
 				   (pane :ink (if (member (namestring path)
 							  *marks* :test #'string=)
-						  +orange+ +blue+))
+						  +orange-red+ +blue+))
 				 (format pane "Dir")))
 			     (slim:cell (format pane "~a" (file/directory-name
 							   (namestring path))))
@@ -253,10 +259,12 @@
 					 (format nil "~a"
 						 (and stat
 						      (osicat-posix:stat-gid stat)))
-					 *gid-username* :test #'string-equal))))))
-			 (slim:cell
-			   (format pane "~a"
-				   (and stat (permissions-as-string path)))))))))
+					 *gid-username* :test #'string-equal)))))
+			   
+			   (slim:cell
+			     (format pane "~a"
+				     (and stat (permissions-as-string
+						(namestring path)))))))))))
       (let ((contents (sort (uiop:directory-files (uiop:getcwd)) #'path<)))
 	(loop for path in contents
 	      unless (and *hide-files* (hidden-pathname-p path))
@@ -267,28 +275,41 @@
 						   'fopen-presentation
 						   :single-box t)
 		       (slim:row
-			 (with-etbembo (pane)
-			   (slim:cell
-			     (with-drawing-options (pane :ink +green4+)
-			       (format pane "File")))
-			   (slim:cell (format pane "~a" (file/directory-name
-							 (namestring path))))
+			 (with-drawing-options
+			     (pane :ink (if (member (namestring path) *marks*
+						    :test #'string=)
+					    +orange-red+ +black+))
+			   (with-text-style
+			       (pane (make-text-style
+				      "ETBembo" (if (member (namestring path)
+							    *marks*
+							    :test #'string=)
+						    "DisplayItalicBold" "RomanLF")
+				      16))
+			     (slim:cell
+			       (with-drawing-options
+				   (pane :ink (if (member (namestring path)
+							  *marks* :test #'string=)
+						  +orange-red+ +green4+))
+				 (format pane "File")))
+			     (slim:cell (format pane "~a" (file/directory-name
+							   (namestring path))))
+			     (slim:cell
+			       (format pane "~a"
+				       (cdr
+					(assoc
+					 (format nil "~a"
+						 (and stat
+						      (osicat-posix:stat-uid stat)))
+					 *uid-username* :test #'string-equal))))
+			     (slim:cell
+			       (format pane "~a"
+				       (cdr
+					(assoc
+					 (format nil "~a"
+						 (and stat
+						      (osicat-posix:stat-gid stat)))
+					 *gid-username* :test #'string-equal)))))
 			   (slim:cell
 			     (format pane "~a"
-				     (cdr
-				      (assoc
-				       (format nil "~a"
-					       (and stat
-						    (osicat-posix:stat-uid stat)))
-				       *uid-username* :test #'string-equal))))
-			   (slim:cell
-			     (format pane "~a"
-				     (cdr
-				      (assoc
-				       (format nil "~a"
-					       (and stat
-						    (osicat-posix:stat-gid stat)))
-				       *gid-username* :test #'string-equal)))))
-			 (slim:cell
-			   (format pane "~a"
-			 	   (and stat (permissions-as-string path))))))))))))
+				     (and stat (permissions-as-string path)))))))))))))

@@ -11,6 +11,6 @@
 			      :validate *directory-deletion-validation-function*))
 
 (define-clfm-command (com-delete-directory) ((directory string))
-  (%delete-directory directory))
+  (%delete-directory (pathname directory)))
 
 
