@@ -23,6 +23,10 @@ and cell. "
 		   :stream stream)))
      (abort () ())))
 
+(defun file-or-directory-exists-p (item)
+  (or (uiop:file-exists-p item)
+      (uiop:directory-exists-p)))
+
 (defun escape-spaces (string)
   (coerce (loop for char in (coerce string 'list)
 		if (char= #\space char)
