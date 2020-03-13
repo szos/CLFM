@@ -88,7 +88,7 @@
 
 (defparameter *clfm-notify-pass-to-notification* nil)
 
-(defmacro clfm-notify ((frame message args-to-pass &rest args)
+(defmacro clfm-notify ((frame message (&rest args-to-pass) &rest args)
 		       &body message-body)
   `(progn
      (setf *clfm-notify-pass-to-notification*
