@@ -13,6 +13,6 @@
    CLFM lets you mark any file or directory and run batch operations on them. By default marking an item is not the primary operation. It can be made such with the functions ~file-prefer-marks~ and ~directory-prefer-marks~. 
    Once items are marked one can open the =Operate/Marks= menu and select =Select Operation=. You will be prompted for an operation to on all marks. 
 *** Operations
-    Operations are defined by the macro ~define-operation~. It works just like defining a function, but they arent callable like a general function. Each operation takes two arguments - the item to operate upon, and a finished argument. When running an operation on the marks, it is funcalled on every mark with finished as nil. After all marks are finished, it is called with the item as nil and finished as t
+    Operations are defined by the macro ~define-operation~. It works just like defining a function, but they arent callable like a general function. Each operation takes two arguments - the item to operate upon, and a finished argument. When running an operation on the marks, it is funcalled on every mark with finished as nil. After all marks are finished, it is called with the item as nil and finished as t. 
 * Quirks
   - In order to leverage the feature of opening another pane as root, CLFM must be in the =$PATH=. 
