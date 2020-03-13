@@ -11,5 +11,16 @@
 			      :validate *directory-deletion-validation-function*))
 
 (define-clfm-command (com-delete-directory) ((directory string))
-  (%delete-directory (pathname directory)))
+  (let ((reter (clfm-notify (*application-frame* "IRREVERSIBLE OPERATION" nil
+						 :exit-boxes ((t "PROCEED")
+							      (nil "ABORT"))
+						 :width 400)
+		 (with-end-of-line-action (pane :wrap*)
+		   (with-etbembo (pane nil 18)
+		     (format pane "You are attempting to delete a file or directory. This operation is ")
+		     (with-etbembo (pane :bold 18)
+		       (format pane "IRREVERSIBLE"))
+		     (format pane ". Proceed with caution."))))))
+    (when reter
+      (%delete-directory (pathname directory)))))
 
