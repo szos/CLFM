@@ -84,3 +84,9 @@ and cell. "
 (define-clfm-command (com-loadrc :name "Load Init File") ()
   (handler-case (load "~/.clfm.d/init.lisp")
     (t () ())))
+
+(define-clfm-command (com-show-marks) ()
+  (setf (frame-current-layout *application-frame*) 'default))
+
+(define-clfm-command (com-hide-marks) ()
+  (setf (frame-current-layout *application-frame*) 'no-marks))
