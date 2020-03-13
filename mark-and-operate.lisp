@@ -8,23 +8,43 @@
       (setf *marks* (remove mark *marks* :test #'string=))
       (setf *marks* (cons mark *marks*))))
 
-(defun operate-on-marks (function)
-  (loop for thing in *marks*
-	do (handler-case (funcall function thing nil)
-	     (t (err)
-	       (let ((ret (notify-user *application-frame*
-				       (format nil "Error '~a'~%was encountered while running~%function '~a'~%with argument '~a'" err function thing)
-				       :exit-boxes '((nil "Continue")
-						     (:destroy-marks "Abort")
-						     (t
-						      "Abort Preserving Marks"))
-				       :title "CLFM Mark Error")))
-		 (when ret
-		   (when (eq :destroy-marks ret)
-		     (setf *marks* nil))
-		   (return-from operate-on-marks))))))
-  (funcall function nil t)
-  (setf *marks* nil))
+(defun operate-on-marks (operation)
+  (let* ((op (symbol-name operation))
+	 (function
+	   (if (assoc operation *mark-operation-commands*)
+	       (cdr (assoc operation *mark-operation-commands*))
+	       (let ((reter
+		       (clfm-notify (*application-frame* "Unknown Operation"
+				     (op)
+				     :exit-boxes ((t "Retry")
+						  (nil "OK"))
+				     :width 300
+				     :text-style
+				     ("ETBembo" "BoldLF" 18))
+			 (with-end-of-line-action (pane :wrap*)
+			   (with-etbembo (pane nil 18)
+			     (format pane "The operation \"~a\" is unknown"
+				     op))))))
+		 (when reter
+		   (com-operate-on-marks))))))
+    (when function
+      (loop for thing in *marks*
+	    do (handler-case (funcall function thing nil)
+		 (t (err)
+		   (let ((ret (notify-user *application-frame*
+					   (format nil "Error '~a'~%was encountered while running~%function '~a'~%with argument '~a'" err function thing)
+					   :exit-boxes
+					   '((nil "Continue")
+					     (:destroy-marks "Abort")
+					     (t
+					      "Abort Preserving Marks"))
+					   :title "CLFM Mark Error")))
+		     (when ret
+		       (when (eq :destroy-marks ret)
+			 (setf *marks* nil))
+		       (return-from operate-on-marks))))))
+      (funcall function nil t)
+      (setf *marks* nil))))
 
 (define-clfm-command (com-operate-on-marks) ()
   ;; ((function 'symbol :prompt "Function"))
@@ -40,20 +60,22 @@
 			      :prompt "Operate Using Function"
 			      :stream stream
 			      :query-identifier 'function))))))
-    (if (assoc fun *mark-operation-commands*)
-	(operate-on-marks (cdr (assoc fun *mark-operation-commands*)))
-	(let ((reter
-		(clfm-notify (*application-frame* "Unknown Operation" (fun)
-						  :exit-boxes ((t "Retry")
-							       (nil "OK"))
-						  :width 300
-						  :text-style
-						  ("ETBembo" "BoldLF" 18))
-		  (with-end-of-line-action (pane :wrap*)
-		    (with-etbembo (pane nil 18)
-		      (format pane "The operation \"~a\" is unknown" fun))))))
-	  (when reter
-	    (com-operate-on-marks))))))
+    (operate-on-marks fun)
+    ;; (if (assoc fun *mark-operation-commands*)
+    ;; 	(operate-on-marks (cdr (assoc fun *mark-operation-commands*)))
+    ;; 	(let ((reter
+    ;; 		(clfm-notify (*application-frame* "Unknown Operation" (fun)
+    ;; 						  :exit-boxes ((t "Retry")
+    ;; 							       (nil "OK"))
+    ;; 						  :width 300
+    ;; 						  :text-style
+    ;; 						  ("ETBembo" "BoldLF" 18))
+    ;; 		  (with-end-of-line-action (pane :wrap*)
+    ;; 		    (with-etbembo (pane nil 18)
+    ;; 		      (format pane "The operation \"~a\" is unknown" fun))))))
+    ;; 	  (when reter
+    ;; 	    (com-operate-on-marks))))
+    ))
 
 ;;; IDEA:
 ;;; Make a «defcommand» type thing and an accompanying accept type to use which
