@@ -13,4 +13,3 @@
 (define-clfm-command (com-delete-directory) ((directory string))
   (%delete-directory (pathname directory)))
 
-
