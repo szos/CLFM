@@ -97,7 +97,8 @@
 		    :menu '(("New File" :command com-new-file)
 			    ("New Directory" :command com-new-dir)
 			    ("Go Home" :command com-chdir-~/)
-			    ("Rename…" :command com-rename-prompt)))
+			    ("Rename…" :command com-rename-prompt)
+			    ("Load Init File" :command com-loadrc)))
 
 (make-command-table 'clfm-help-menu
 		    :errorp nil
