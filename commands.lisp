@@ -85,11 +85,18 @@
 
 (set-directory-command-order)
 
+(defun file-prefer-marks ()
+  (set-file-command-order :mark 5))
+
+(defun directory-prefer-marks ()
+  (set-directory-command-order :mark 3))
+
 (make-command-table 'clfm-menu-bar
 		    :errorp nil
 		    :menu '(("Quit" :command com-quit)
 			    ("File" :menu clfm-file)
 			    ("Operate/Marks" :menu clfm-operation-menu)
+			    ("View" :menu clfm-view-menu)
 			    ("Help" :menu clfm-help-menu)))
 
 (make-command-table 'clfm-file
@@ -100,11 +107,22 @@
 			    ("Rename…" :command com-rename-prompt)
 			    ("Load Init File" :command com-loadrc)))
 
+(make-command-table 'clfm-operation-menu
+		    :errorp nil
+		    :menu '(("Select Operation" :command com-operate-on-marks)))
+
+(make-command-table 'clfm-view-menu
+		    :errorp nil
+		    :menu '(("Marks" :menu clfm-view-marks-menu)))
+
+(make-command-table 'clfm-view-marks-menu
+		    :errorp nil
+		    :menu '(("Show Marks" :command com-show-marks)
+			    ("Hide Marks" :command com-hide-marks)))
+
 (make-command-table 'clfm-help-menu
 		    :errorp nil
 		    :menu '(("Help Window" :command com-display-help-window)))
 
-(make-command-table 'clfm-operation-menu
-		    :errorp nil
-		    :menu '(("Select Operation" :command com-operate-on-marks)))
+
 
