@@ -6,7 +6,7 @@
   This is a very regular file manager. It is mainly mouse driven, but the plan is to make it more keyboard oriented. 
 
 ** Init file
-   CLFM reads from an init file at ~~/.clfm.d/init.lisp~.
+   CLFM reads from an init file at =~/.clfm.d/init.lisp=.
 ** Opening files and entering directories
    clicking on an item will either open it via =xdg-open=, or if its a directory it is entered. 
 *** Clicking
