@@ -1,5 +1,9 @@
 (in-package :clfm-2)
 
+(define-gesture-name :meta-click-left :pointer-button (:left :meta))
+
+(define-gesture-name :meta-control :keyboard (:control :meta))
+
 (define-presentation-type fopen-presentation ())
 
 (defun set-file-command-order (&key
@@ -8,13 +12,18 @@
 				 (open-with 3)
 				 (rename 2)
 				 (copy 1)
-				 (mark 0))
+				 ;; (mark 0)
+				 )
   "the higher the number, the higher on the list it will be"
+  ;; (define-presentation-to-command-translator fshift-click
+  ;;     (fopen-presentation com-mark-between-items))
   (define-presentation-to-command-translator fmark
       (fopen-presentation com-add-mark clfm
-       :gesture :select
+       ;; :gesture :select
+       :gesture :meta-click-left
        :documentation "Mark File"
-       :priority mark)
+       ;; :priority mark
+       )
       (file)
     (list file))
   (define-presentation-to-command-translator fdelete
@@ -57,15 +66,27 @@
 
 (define-presentation-type chdir-presentation ())
 
+;; (define-gesture-name :double-click :pointer-button (:left :double))
+
 (defun set-directory-command-order (&key
-				      (change-directory 2)
+				      (change-directory 3)
 				      (delete -1)
-				      (mark 1))
+				      ;; (mark 2)
+				      (copy 1))
+  (define-presentation-to-command-translator dcopy
+      (chdir-presentation com-copy-directory-prompt clfm
+       :gesture :select
+       :documentation "Copy Directory"
+       :priority copy)
+      (dir)
+    (list dir))
   (define-presentation-to-command-translator chdir
       (chdir-presentation com-change-directory clfm
        :gesture :select
+       ;; :gesture :double-click
        :Documentation "Change to Directory"
-       :priority change-directory)
+       :priority change-directory
+       )
       (dir)
     (list dir))
   (define-presentation-to-command-translator dir-delete
@@ -77,9 +98,11 @@
     (list dir))
   (define-presentation-to-command-translator dmark
       (chdir-presentation com-add-mark clfm
-       :gesture :select
+       ;; :gesture :select
+       :gesture :meta-click-left
        :documentation "Mark Directory"
-       :priority mark)
+       ;; :priority mark
+       )
       (file)
     (list file)))
 
@@ -90,6 +113,12 @@
 
 (defun directory-prefer-marks ()
   (set-directory-command-order :mark 3))
+
+;; (define-drag-and-drop-translator drag-and-drop-directory
+;;     (chdir-presentation
+;;      chdir-presentation dcopy clfm
+;;      :documentation "drag and drop file"
+;;      :gesture ))
 
 (make-command-table 'clfm-menu-bar
 		    :errorp nil
@@ -113,7 +142,9 @@
 
 (make-command-table 'clfm-view-menu
 		    :errorp nil
-		    :menu '(("Marks" :menu clfm-view-marks-menu)))
+		    :menu '(("Marks" :menu clfm-view-marks-menu)
+			    ("Display Hidden Files" :command
+			     com-toggle-hidden-files)))
 
 (make-command-table 'clfm-view-marks-menu
 		    :errorp nil
