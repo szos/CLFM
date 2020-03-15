@@ -38,5 +38,8 @@
 (define-clfm-command (com-rename-this) ((thing string))
   (%rename-file-directory thing))
 
+(define-clfm-command (com-rename-this) ((thing t))
+  (%rename-file-directory thing))
+
 (define-clfm-command (com-rename-prompt) ()
   (%rename-file-directory))
