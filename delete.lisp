@@ -1,9 +1,6 @@
 
 (in-package :clfm-2)
 
-(define-clfm-command (com-rm-file) ((file string))
-  (delete-file file))
-
 (defparameter *directory-deletion-validation-function* 'validate-directory)
 
 (defun validate-directory (directory)
@@ -13,7 +10,7 @@
   (uiop:delete-directory-tree dir
 			      :validate *directory-deletion-validation-function*))
 
-(define-clfm-command (com-delete-directory) ((directory string))
+(defun delete-directory (directory)
   (let ((reter (clfm-notify (*application-frame* "IRREVERSIBLE OPERATION" nil
 						 :exit-boxes ((t "PROCEED")
 							      (nil "ABORT"))
@@ -27,7 +24,7 @@
     (when reter
       (%delete-directory (pathname directory)))))
 
-(define-clfm-command (com-delete-item) ((item string))
+(defun delete-item (item)
   (let ((reter (clfm-notify (*application-frame* "IRREVERSIBLE OPERATION" nil
 						 :exit-boxes ((t "PROCEED")
 							      (nil "ABORT"))
@@ -44,4 +41,8 @@
 	    ((uiop:file-exists-p item)
 	     (delete-file item))))))
 
-
+(define-clfm-command (com-delete) ((item string))
+  (cond ((uiop:directory-exists-p item)
+	 (delete-directory item))
+	((uiop:file-exists-p item)
+	 (delete-item item))))
