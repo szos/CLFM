@@ -8,6 +8,14 @@
       (setf *marks* (remove mark *marks* :test #'string=))
       (setf *marks* (cons mark *marks*))))
 
+(define-clfm-command (com-add-mark) ((markl t))
+  (let ((mark (if (listp markl)
+		  (namestring (car markl))
+		  markl)))
+    (if (member mark *marks* :test #'string=)
+	(setf *marks* (remove mark *marks* :test #'string=))
+	(setf *marks* (cons mark *marks*)))))
+
 (defun operate-on-marks (operation)
   (let* ((op (symbol-name operation))
 	 (function
