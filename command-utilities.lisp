@@ -90,3 +90,7 @@ and cell. "
 
 (define-clfm-command (com-hide-marks) ()
   (setf (frame-current-layout *application-frame*) 'no-marks))
+
+(define-clfm-command (com-toggle-hidden-files) ()
+  (setf *hide-files* (not *hide-files*))
+  (redisplay-frame-panes *application-frame* :force-p t))
