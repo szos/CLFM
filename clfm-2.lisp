@@ -135,7 +135,10 @@
 	  :display-function #'display-marks
 	  :width 600)
    (current-directory :application
-		      :display-function #'display-current-directory)
+		      :display-function #'display-current-directory
+		      :scroll-bars t
+		      :incremental-redisplay t
+		      )
    (interactor :interactor))
   (:layouts
    (default
@@ -144,8 +147,9 @@
       (20 info)
       (horizontally ()
 	(:fill current-directory))
-      (make-pane 'clim-extensions:box-adjuster-gadget)
-      (100 interactor)))
+      ;; (make-pane 'clim-extensions:box-adjuster-gadget)
+      ;; (100 interactor)
+      ))
    (no-marks
     (vertically ()
       (20 info)
