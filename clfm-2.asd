@@ -25,4 +25,5 @@
 	       (:file "copy")
 	       (:file "move-file-directory")
 	       (:file "mark-and-operate")
-	       (:file "commands")))
+	       (:file "commands")
+	       (:file "commands-update")))
