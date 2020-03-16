@@ -72,7 +72,9 @@ and cell. "
     ((command string :prompt "/bin/sh -c"))
   (uiop:launch-program (format nil "/bin/sh -c ~a" command)))
 
-(define-clfm-command (com-quit :name "Quit") ()
+(define-gesture-name :exit-clfm :keyboard (#\q :control :meta))
+
+(define-clfm-command (com-quit :name "Quit" :keystroke :exit-clfm) ()
   (frame-exit *application-frame*))
 (define-clfm-command (com-exit :name "Exit") ()
   (frame-exit *application-frame*))
