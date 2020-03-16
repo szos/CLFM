@@ -26,4 +26,5 @@
 	       (:file "move-file-directory")
 	       (:file "mark-and-operate")
 	       (:file "commands")
-	       (:file "commands-update")))
+	       (:file "commands-update")
+	       (:file "keybindings")))
