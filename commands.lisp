@@ -81,7 +81,7 @@
       (dir)
     (list dir))
   (define-presentation-to-command-translator chdir
-      (chdir-presentation com-change-directory clfm
+      (chdir-presentation com-change-directory-temper clfm
        :gesture :select
        ;; :gesture :double-click
        :Documentation "Change to Directory"
@@ -153,7 +153,9 @@
 
 (make-command-table 'clfm-help-menu
 		    :errorp nil
-		    :menu '(("Help Window" :command com-display-help-window)))
+		    :menu '(("Help Window" :command com-display-help-window)
+			    ("test" :command com-move-down
+			     :keystroke (:n :control))))
 
 
 
