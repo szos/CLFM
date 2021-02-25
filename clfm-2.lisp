@@ -23,18 +23,26 @@
 	      ,name-gensym
 	      (return-from ,block-gensym (progn ,@body))))))))
 
-(defmacro with-etbembo ((stream &optional type (size 16)) &body body)
+;; (defmacro monospaced ((stream &optional (type :roman) (size 16)) &body body)
+;;   `(with-text-style (,stream (make-text-style :fix ,type ,size))
+;;      ,@body))
+
+(defmacro with-etbembo ((stream &optional (type :roman) (size 16)) &body body)
+  ;; `(with-text-style (,stream (make-text-style :serif ,type ,size))
+  ;;    ,@body)
   `(with-text-style (,stream (make-text-style "ETBembo"
-					      (cond ((eq ,type :bold)
-						     "BoldLF")
-						    ((eq ,type :semi-bold)
-						     "SemiBoldOSF")
-						    ((eq ,type :italic)
-						     "DisplayItalic")
-						    ((eq ,type :italic-bold)
-						     "DisplayItalicBold")
-						    (t "RomanLF"))
-					      ,size))
+        				      ,(cond ((eq type :bold)
+        					      "BoldLF")
+        					     ((eq type :semi-bold)
+        					      "SemiBoldOSF")
+        					     ((eq type :italic)
+        					      "DisplayItalic")
+        					     ((eq type :italic-bold)
+        					      "DisplayItalicBold")
+        					     ((eq type :super-bold)
+        					      "SuperBoldOSF")
+        					     (t "RomanLF"))
+        				      ,size))
      ,@body))
 
 (defun make-executable ()
@@ -45,18 +53,17 @@
 			    :purify t))
 
 (defun file-extension (file)
-  (let ((r (reverse (car (cl-ppcre:split "\\." (reverse (if (pathnamep file)
-							    (format nil "~a" file)
-							    file)))))))
-    r))
+  (reverse (car (cl-ppcre:split "\\." (reverse (namestring file))))))
 
 (defun initialize-fonts ()
-  (loop for f in (uiop:directory-files (asdf:system-relative-pathname
-					"clfm-2" "fonts/" :type :directory))
-	when (string= "ttf" (file-extension f))
-	  do ;; (format t "Font: ~a" f)
-	     (loop for size in '(8 10 12 14 16 18 24 48 72)
-		   do (mcclim-truetype::make-truetype-font (find-port) f size))))
+  (let ((port (find-port)))
+    (loop for f in (uiop:directory-files (asdf:system-relative-pathname
+                                          "clfm-2" "fonts/" :type :directory))
+          when (string= "ttf" (file-extension f))
+            do ;; (format t "Font: ~a" f)
+               (loop for size in '(8 10 12 14 16 18 24 48 72)
+                     do (mcclim-truetype::make-truetype-font port f size))))
+  )
 
 (defun gather-users-uid-gid ()
   (let ((uid-lists '())
@@ -95,13 +102,15 @@
 			     ("x" . #.nix:s-ixoth))
   "for use in permissions-as-string, used to show permissions like ls -l")
 
+(defun permissions-as-list (pathname)
+  (let ((mode (nix:stat-mode (nix:stat pathname))))
+    (loop for (name . value) in +clfm-permissions+
+          if (plusp (logand mode value))
+            collect name
+          else collect "-")))
+
 (defun permissions-as-string (pathname)
-  (apply 'concatenate 'string
-	 (let ((mode (nix:stat-mode (nix:stat pathname))))
-	   (loop for (name . value) in +clfm-permissions+
-		 if (plusp (logand mode value))
-		   collect name
-		 else collect "-"))))
+  (apply 'concatenate 'string (permissions-as-list pathname)))
 
 (defun hidden-pathname-p (path)
   (let ((pathname (namestring path)))
@@ -137,8 +146,7 @@
    (current-directory :application
 		      :display-function #'display-current-directory
 		      :scroll-bars t
-		      :incremental-redisplay t
-		      )
+		      :incremental-redisplay t)
    (interactor :interactor))
   (:layouts
    (default
@@ -187,8 +195,10 @@
 		       (pane (format nil "~{~a~^/~}/"
 				     (append ac (list (car input))))
 			     'chdir-presentation)
-		     (format pane "~a/" (car input)))
-		   (looper (cdr input) (append ac (list (car input)))))
+		     (format pane "~a/" (car input))
+		     )
+		   (looper (cdr input) (append ac (list (car input))))
+		   )
 		 (unless ac
 		   (with-output-as-presentation (pane "/"
 						      'chdir-presentation)
@@ -206,7 +216,7 @@
     (with-etbembo (pane :italic)
       (format pane "~{~a~^  ~}" (or *marks* '(""))))))
 
-;; 📁 is the folder uncode codepoint
+;; 📁 is the folder uncode codepoint (01f4c1)
 
 (defun display-current-directory (frame pane)
   (declare (ignore frame))

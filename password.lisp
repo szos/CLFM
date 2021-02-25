@@ -11,7 +11,7 @@
   (when acceptably (error "Not acceptably"))
   (write-string (make-string (length password) :initial-element #\*) stream))
 
-(define-presentation-method accept ((type password) stream (view textual-view)
+(define-presentation-method accept ((type password) stream view ;; (view textual-view)
 						    &key)
   (let* ((s (stream-scan-pointer stream))
 	 (p (with-output-recording-options (stream :draw nil :record nil)
@@ -19,3 +19,12 @@
     (presentation-replace-input stream p 'password view
 				:buffer-start s)
     (return-from accept p)))
+
+;; (define-presentation-method accept ((type password) stream view ;; (view textual-view)
+;; 						    &key)
+;;   (let* ((s (stream-scan-pointer stream))
+;; 	 (p (clim:with-output-recording-options (stream :draw t :record nil)
+;; 	      (read-token stream))))
+;;     (presentation-replace-input stream p 'password view
+;; 				:buffer-start s)
+;;     (return-from accept p)))

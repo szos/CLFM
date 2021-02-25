@@ -70,8 +70,9 @@ a capital S in the modifier position changes the character to a capital. "
       (format pane "Current Directory: "))
     (with-etbembo (pane :italic-bold)
       (looper (cl-ppcre:split "/" (namestring (uiop:getcwd))))
-      (format pane "~a"
-	      (car (reverse (cl-ppcre:split "/" (namestring (current-item)))))))))
+      (with-etbembo (pane)
+        (format pane "[~a]"
+                (car (reverse (cl-ppcre:split "/" (namestring (current-item))))))))))
 
 (define-clfm-command (com-change-directory-temper) ((directory string))
   (handler-case 
@@ -177,7 +178,6 @@ M-RET (meta + return or Alt + return) to submit it"
 
 (define-gesture-name :meta-control :keyboard (:control :meta))
 
-(define-gesture-name :next-item :keyboard (#\n :control))
 (define-gesture-name :prev-item :keyboard (#\p :control))
 (define-gesture-name :mark-item :keyboard (#\m :control))
 
@@ -277,7 +277,7 @@ finished."
        (multiple-value-prog1 (progn ,@body)
 	 (when ,bottom-p (scroll-pane-to-bottom ,pane))))))
 
-(let (pre-selection-contents
+(let ((pre-selection-contents nil)
       (selected-item
 	(let ((all (append (sort (uiop:subdirectories (uiop:getcwd)) #'path<)
 			   (sort (uiop:directory-files (uiop:getcwd)) #'path<))))
@@ -316,89 +316,100 @@ finished."
   (defun move-selection-down ()
     (when post-selection-contents
       (setf pre-selection-contents (cons selected-item pre-selection-contents))
-      (setf selected-item (pop post-selection-contents))))
+      (setf selected-item (pop post-selection-contents))
+      ;; (scroll-extent ())
+      ))
   (defun display-current-directory (frame pane)
     (declare (ignore frame))
-    (slim:with-table (pane)
-      (labels ((display-item (path &optional current)
-		 (let ((stat (handler-case (osicat-posix:stat path) (t () nil))))
-		   (with-output-as-presentation (pane
-						 (namestring path)
-						 'filesystem-presentation
-						 :single-box t)
-		     (slim:row
-		       (slim:cell
-			 (if (member (namestring path)
-				     *marks* :test #'string-equal)
-			     (with-drawing-options (pane :ink +red+)
-			       (format pane "*"))
-			     (with-drawing-options (pane :ink +black+)
-			       (format pane " "))))
-		       (with-drawing-options
-			   (pane :ink (if (member (namestring path) *marks*
-						  :test #'string=)
-					  (if current +purple+ +orange-red+)
-					  (if current +purple+ +black+)))
-			 (with-text-style
-			     (pane (make-text-style
-				    "ETBembo"
-				    (cond ((member (namestring path) *marks*
-						   :test #'string=)
-					   "DisplayItalicBold")
-					  ;; (current "SuperBoldOSF")
-					  (t "RomanLF"))
-				    
-				    16))
-			   (slim:cell
-			     (if (uiop:directory-exists-p path)
-				 (with-drawing-options
-				     (pane :ink (if (member (namestring path)
-							    *marks*
-							    :test #'string=)
-						    +orange-red+ +blue+))
-				   (format pane "DIR"))
-				 (with-drawing-options
-				     (pane :ink (if (member (namestring path)
-							    *marks*
-							    :test #'string=)
-						    +orange-red+ +green4+))
-				   (format pane "FILE"))))
-			   (slim:cell (format pane "~a" (file/directory-name
-							 (namestring path))))
-			   (slim:cell
-			     (format pane "~a"
-				     (cdr
-				      (assoc
-				       (format nil "~a"
-					       (and stat
-						    (osicat-posix:stat-uid stat)))
-				       *uid-username* :test #'string-equal))))
-			   (slim:cell
-			     (format pane "~a"
-				     (and stat (permissions-as-string
-						path)))))))))
-		 ))
-	(when pre-selection-contents
-	  (loop for path in (reverse pre-selection-contents)
-		unless (and *hide-files* (hidden-pathname-p path))
-		  do (display-item path)))
-	(when selected-item
-	  (display-item selected-item t))
-	(when post-selection-contents
-	  (loop for path in post-selection-contents
-		unless (and *hide-files* (hidden-pathname-p path))
-		  do (display-item path)))
-	;; (when (< (length post-selection-contents) (length pre-selection-contents))
-	;;   (scroll-pane-to-bottom pane))
-	))))
+    (display-current-directory-worker pane pre-selection-contents selected-item post-selection-contents)))
+
+(defun display-current-directory-worker (pane pre-selection-contents selected-item post-selection-contents)
+  (slim:with-table (pane)
+    (labels ((display-item (path &optional current)
+               (let ((stat (handler-case (osicat-posix:stat path) (t () nil))))
+                 (with-output-as-presentation (pane
+                                               (namestring path)
+                                               'filesystem-presentation
+                                               :single-box t)
+                   (slim:row
+                     (slim:cell
+                       (if (member (namestring path)
+                                   *marks* :test #'string-equal)
+                           (with-drawing-options (pane :ink +red+)
+                             (format pane "*"))
+                           (with-drawing-options (pane :ink +black+)
+                             (format pane " "))))
+                     (with-drawing-options
+                         (pane :ink (if (member (namestring path) *marks*
+                                                :test #'string=)
+                                        (if current +purple+ +orange-red+)
+                                        (if current +purple+ +black+)))
+                       (with-text-style
+                           (pane (make-text-style
+                                  "ETBembo"
+                                  (cond ((member (namestring path) *marks*
+                                                 :test #'string=)
+                                         "DisplayItalicBold")
+                                        ;; (current "SuperBoldOSF")
+                                        (t "RomanLF"))
+                                  
+                                  16))
+                         (slim:cell
+                           (if (uiop:directory-exists-p path)
+                               (with-drawing-options
+                                   (pane :ink (if (member (namestring path)
+                                                          *marks*
+                                                          :test #'string=)
+                                                  +orange-red+ +blue+))
+                                 (format pane "DIR"))
+                               (with-drawing-options
+                                   (pane :ink (if (member (namestring path)
+                                                          *marks*
+                                                          :test #'string=)
+                                                  +orange-red+ +green4+))
+                                 (format pane "FILE"))))
+                         (slim:cell (format pane "~a" (file/directory-name
+                                                       (namestring path))))
+                         (slim:cell
+                           (format pane "~a"
+                                   (cdr
+                                    (assoc
+                                     (format nil "~a"
+                                             (and stat
+                                                  (osicat-posix:stat-uid stat)))
+                                     *uid-username* :test #'string-equal))))
+
+                         )
+                       (slim:cell
+                         (format pane "~a"
+                                 (and stat (permissions-as-string
+                                            path))))
+                       ;; (let ((strs (permissions-as-list path)))
+                       ;;   (loop for s in strs
+                       ;;         do (slim:cell (format pane s))))
+                       ))))
+               ))
+      (when pre-selection-contents
+        (loop for path in (reverse pre-selection-contents)
+              unless (and *hide-files* (hidden-pathname-p path))
+                do (display-item path)))
+      (when selected-item
+        (display-item selected-item t))
+      (when post-selection-contents
+        (loop for path in post-selection-contents
+              unless (and *hide-files* (hidden-pathname-p path))
+                do (display-item path)))
+      ;; (when (< (length post-selection-contents) (length pre-selection-contents))
+      ;;   (scroll-pane-to-bottom pane))
+      )))
 
 (define-gesture-name :next-item :keyboard (#\n :control))
 (define-gesture-name :prev-item :keyboard (#\p :control))
 (define-gesture-name :mark-item :keyboard (#\space :control))
 (define-gesture-name :up-directory :keyboard (#\p :meta))
-(define-gesture-name :open :keyboard (#\o :control))
+;; (define-gesture-name :open :keyboard (#\o :control))
 (define-gesture-name :open :keyboard (:return :control))
-(define-gesture-name test :keyboard (#\t :control :meta)
+(define-gesture-name :test :keyboard (#\t :control :meta)
   ;; (:return :control)
   )
 
@@ -417,10 +428,10 @@ finished."
 (define-clfm-command (com-keyboard-mark :keystroke :mark-item) ()
   (add-current-selected-to-marks))
 
-(define-clfm-command (com-up-directory :keystroke (#\a :control)) ()
+(define-clfm-command (com-up-directory :keystroke :up-directory) ()
   (change-directory (concatenate 'string (namestring (uiop:getcwd)) "../")))
 
-(define-clfm-command (com-keyboard-open :keystroke (:return :control)) ()
+(define-clfm-command (com-keyboard-open :keystroke :open) ()
   (enter-or-open-current-selection))
 
 ;; (define-clfm-command (com-test-test-keyboard :keystroke ;; (#\k :control)

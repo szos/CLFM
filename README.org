@@ -1,4 +1,6 @@
 #+TITLE: the Common Lisp File Manager
+* Demo
+  [[./demo.mp4]]
 
 * Running
   There are two options for running this application, make an executable or open it from a running lisp image. There is a script included called =make-executable.sh=, which creates a standalone executable that you can copy wherever youd like. To make an executable one requires SBCL and Quicklisp installed, and the script will check for this and exit if they aren't found. If you wish to install CLFM, I recommend creating a symbolic link to a location in your path - I use =~/.bin=. This allows you to rebuild the binary at any time without having to copy it. 

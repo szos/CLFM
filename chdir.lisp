@@ -51,6 +51,6 @@ M-RET (meta + return or Alt + return) to submit it"
 		 (format nil "echo \"~a\" | sudo -S clfm" passwd)))))))))
 
 (define-clfm-command (com-chdir-~/ :name "Go Home") ()
-  (com-change-directory "~/"))
+  (com-change-directory-temper "~/"))
 
 
