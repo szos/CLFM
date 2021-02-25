@@ -1,6 +1,6 @@
 #+TITLE: the Common Lisp File Manager
 * Demo
-  [[/home/szos/quicklisp/local-projects/clfm-2/clfm-demo-picture.png]]
+  [[./clfm-demo-picture.png]]
   see demo.mp4 for a video
 
 * Running
