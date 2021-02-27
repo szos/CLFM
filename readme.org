@@ -1,0 +1,12 @@
+#+TITLE: Common Lisp File Manager
+
+CLFM is a file manager written in common lisp, inspired by XFE. It can have 1 to 3 panes; a filesystem tree and two panels.
+
+* Usage
+  Clicking on a file or directory opens it - files will be opened via =xdg-open=, while directories will be entered. One can also right click on an entry for a list of applicable operations. The look and feel of this application can be modified through the =Properties= entry in the =File= menu. This will open up a series of frames prompting for input in various ways. These windows should be exited via their respective buttons, and not by closing the window. Some changes will require a restart. This should not be done via quiting and starting again, but by using the =Restart= entry in the =File= menu. 
+
+** Loading
+   To load this system you will need to have quicklisp installed and have =defconfig= somewhere quicklisp can find it. Defconfig can be found [[https://github.com/szos/defconfig][here]].
+
+   Once the dependencies are in place open up a lisp repl and evaluate ~(ql:quickload :common-lisp-file-manager)~, followed by ~(common-lisp-file-manager:app-main)~. 
+  
