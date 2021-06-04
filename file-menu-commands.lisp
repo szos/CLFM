@@ -107,7 +107,11 @@
                          (setf (clfm-prompt-result frame) nil)
                          (frame-exit frame))))))))))
 
-;; pass in both panels current directories. 
+;; pass in both panels current directories.
+
+(defun touch (pathname)
+  (let ((f (open pathname :if-does-not-exist :create)))
+    (close f :abort t)))
 
 (define-clfm-command (com-touch-file) ()
   (let* ((p1 (find-pane-named *application-frame* 'panel-1))
@@ -123,8 +127,13 @@
                                        (list (namestring (pane-directory p2)))))
                  :dir (namestring (pane-directory p1)))))
     (run-frame-top-level frame)
-    (notify-user *application-frame*
-                 (format nil "touch '~A'" (clfm-prompt-result frame)))))
+    (when (and (clfm-prompt-result frame)
+	       (not (osicat:file-exists-p (clfm-prompt-result frame))))
+      (touch (clfm-prompt-result frame)))))
+
+(defun mkdir (directory)
+  (unless (osicat:directory-exists-p directory)
+    (ensure-directories-exist directory)))
 
 (define-clfm-command (com-mkdir) ()
   (let* ((p1 (find-pane-named *application-frame* 'panel-1))
@@ -140,8 +149,8 @@
                                        (list (namestring (pane-directory p2)))))
                  :dir (namestring (pane-directory p1)))))
     (run-frame-top-level frame)
-    (notify-user *application-frame*
-                 (format nil "mkdir '~A'" (clfm-prompt-result frame)))))
+    (when (clfm-prompt-result frame)
+      (mkdir (clfm-prompt-result frame)))))
 
 (define-clfm-command (com-open-file-with) ((file clfm-file))
   (let ((program (prompt-for-text-input "Enter Program" *application-frame*)))
