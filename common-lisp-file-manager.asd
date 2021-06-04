@@ -1,9 +1,9 @@
 ;;;; common-lisp-file-manager.asd
 
 (asdf:defsystem #:common-lisp-file-manager
-  :description "Describe common-lisp-file-manager here"
-  :author "Your Name <your.name@example.com>"
-  :license  "Specify license here"
+  :description "Common Lisp File Manager, or CLFM, is a file manager written in CL."
+  :author "szos at posteo dot net"
+  :license "gplv3"
   :version "0.0.1"
   :serial t
   :depends-on (#:osicat #:alexandria #:mcclim #:slim
