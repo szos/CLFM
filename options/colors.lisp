@@ -94,7 +94,12 @@
                                    (setf (clfm-prompt-result frame) r)
                                    (frame-exit frame))
                                  (notify-user frame
-                                              (format nil "~a does not represent a color" r))))))))))))))
+                                              (format nil "~a does not represent a color" r))))))
+	      (make-pane 'push-button :label "Cancel"
+				      :activate-callback
+				      (lambda (gadget)
+					(let ((frame (gadget-client gadget)))
+					  (frame-exit frame))))))))))))
 
 (defun update (frame)
   (let ((red (red frame))
